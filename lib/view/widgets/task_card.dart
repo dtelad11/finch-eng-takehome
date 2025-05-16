@@ -25,7 +25,7 @@ class TaskCard extends StatelessWidget {
       return null;
     }
 
-    return 'Repeats on: ' +
+    return '📅 Repeats on: ' +
       task.recurringDays!
         .map((d) => dayInitials[(d - 1)])
         .join(', ');

@@ -20,7 +20,7 @@ class _TaskFormState extends State<TaskForm> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   TaskCategory _selectedCategory = TaskCategory.productivity;
-  bool _isRecurring = false;
+  bool _isRecurring = true;
   /* Elli: This should be better managed via enums mapping to weekdays, which
      should be defined in `task.dart`. */
   final List<bool> _selectedDays = List.filled(7, true);
@@ -207,6 +207,11 @@ class _TaskFormState extends State<TaskForm> {
                   style: TextStyle(color: AppTheme.colors.error, fontSize: 12),
                 ),
               ],
+            ] else ... [
+              Text(
+                'Recurring tasks help build lasting habits 💪',
+                style: TextStyle(fontSize: 16),
+              ),
             ],
             SizedBox(height: AppTheme.spacing.large),
 
