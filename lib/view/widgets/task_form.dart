@@ -7,55 +7,6 @@ import 'package:birdo/view/widgets/common/chunky_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class TaskFormDialog extends StatelessWidget {
-  const TaskFormDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      elevation: 0,
-
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Consumer<TaskManager>(
-              builder: (context, taskManager, child) {
-                String dateText = 'Today';
-
-                final now = DateTime.now();
-                final currentDay = taskManager.currentDay;
-                if (currentDay.year != now.year ||
-                    currentDay.month != now.month ||
-                    currentDay.day != now.day) {
-                  dateText =
-                      '${currentDay.year}-${currentDay.month.toString().padLeft(2, '0')}-${currentDay.day.toString().padLeft(2, '0')}';
-                }
-
-                return Text(
-                  'Add Task for $dateText',
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-            TaskForm(
-              onTaskAdded: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class TaskForm extends StatefulWidget {
   final VoidCallback? onTaskAdded;
 
