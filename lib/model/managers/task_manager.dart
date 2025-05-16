@@ -114,7 +114,9 @@ class TaskManager extends BaseManager {
   Future<void> createTask(
     String title,
     int energyReward,
-    TaskCategory category, {
+    TaskCategory category,
+    bool isRecurring,
+    List<int>? recurringDays, {
     DateTime? date,
   }) async {
     debugPrint('TaskManager: Creating task: $title');
@@ -124,6 +126,8 @@ class TaskManager extends BaseManager {
         title: title,
         energyReward: energyReward,
         category: category,
+        isRecurring: isRecurring,
+        recurringDays: recurringDays,
         date: targetDate,
       );
       debugPrint('TaskManager: Created task: ${task.title} (${task.id})');

@@ -20,6 +20,13 @@ class _TaskFormState extends State<TaskForm> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   TaskCategory _selectedCategory = TaskCategory.productivity;
+  bool _isRecurring = false;
+  /* Elli: This should be better managed via enums mapping to weekdays, which
+     should be defined in `task.dart`. */
+  final List<bool> _selectedDays = List.filled(7, true);
+  String? _selectedDaysError;
+
+  final List<String> _dayInitials = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'];
 
   @override
   void dispose() {
@@ -33,14 +40,38 @@ class _TaskFormState extends State<TaskForm> {
       final taskController = Provider.of<TaskController>(context, listen: false);
       final taskManager = Provider.of<TaskManager>(context, listen: false);
       
+      // Validate that at least one day was selected.
+      if (_isRecurring && !_selectedDays.contains(true)) {
+        setState(() {
+          _selectedDaysError = 'Please select at least one day';
+        });
+        return;
+      } else {
+        setState(() {
+          _selectedDaysError = null;
+        });
+      }
+
       // Get the current date from the task manager
       final targetDate = taskManager.currentDay;
+
+      // Convert the selected days bool list to a list of weekday ints.
+      final List<int> recurringDays = _isRecurring
+      ? _selectedDays
+          .asMap()
+          .entries
+          .where((entry) => entry.value)
+          .map((entry) => entry.key + 1)
+          .toList()
+      : [];
 
       // Use the task controller to create the task
       taskController.createTask(
         title,
         5, // Default energy reward
         _selectedCategory,
+        _isRecurring,
+        recurringDays,
         date: targetDate,
       );
 
@@ -133,6 +164,50 @@ class _TaskFormState extends State<TaskForm> {
                 }
               },
             ),
+            SizedBox(height: AppTheme.spacing.large),
+
+            CheckboxListTile(
+              title: const Text('Repeat Task?'),
+              value: _isRecurring,
+              onChanged: (bool? value) {
+                if (value != null) {
+                  setState(() {
+                    _isRecurring = value;
+                  });
+                }
+              },
+              controlAffinity: ListTileControlAffinity.leading,
+              contentPadding: EdgeInsets.zero,
+            ),
+
+            if (_isRecurring) ...[
+              SizedBox(height: AppTheme.spacing.small),
+              Text('Repeat on'),
+              SizedBox(height: AppTheme.spacing.small),
+
+              ToggleButtons(
+                isSelected: _selectedDays,
+                onPressed: (int index) {
+                  setState(() {
+                    _selectedDays[index] = !_selectedDays[index];
+                  });
+                },
+                borderRadius: BorderRadius.circular(AppTheme.radius.medium),
+                selectedColor: AppTheme.colors.onPrimary,
+                fillColor: AppTheme.colors.surfaceDark,
+                color: AppTheme.colors.primary,
+                constraints: BoxConstraints(minHeight: 40, minWidth: 40),
+                children: _dayInitials.map((label) => Text(label)).toList(),
+              ),
+
+              if (_selectedDaysError != null) ...[
+                SizedBox(height: AppTheme.spacing.small),
+                Text(
+                  _selectedDaysError!,
+                  style: TextStyle(color: AppTheme.colors.error, fontSize: 12),
+                ),
+              ],
+            ],
             SizedBox(height: AppTheme.spacing.large),
 
             ChunkyButton(

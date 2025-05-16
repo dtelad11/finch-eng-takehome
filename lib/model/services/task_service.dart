@@ -79,12 +79,16 @@ class TaskService {
     required String title,
     required int energyReward,
     required TaskCategory category,
+    required bool isRecurring,
+    List<int>? recurringDays,
     DateTime? date,
   }) async {
     final task = Task.create(
       title: title,
       energyReward: energyReward,
       category: category,
+      isRecurring: isRecurring,
+      recurringDays: recurringDays,
     );
 
     final targetDate = date ?? ServiceLocator.dateTimeService.getCurrentDate();

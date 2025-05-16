@@ -16,6 +16,21 @@ class TaskCard extends StatelessWidget {
     this.onCheckboxChanged,
   });
 
+  String? _formatDescription(Task task) {
+    // Format the task's recurring days as a 
+    // Elli: See note in task_form.dart about using enums.
+    const List<String> dayInitials = ['M', 'Tu', 'W', 'Th', 'F', 'Sa', 'Su'];
+
+    if (!task.isRecurring || task.recurringDays == null || task.recurringDays!.isEmpty) {
+      return null;
+    }
+
+    return 'Repeats on: ' +
+      task.recurringDays!
+        .map((d) => dayInitials[(d - 1)])
+        .join(', ');
+  }
+
   @override
   Widget build(BuildContext context) {
     Color categoryColor = _getCategoryColor(task.category);
@@ -27,6 +42,7 @@ class TaskCard extends StatelessWidget {
       ),
       child: ChunkyTaskCard(
         title: task.title,
+        description: _formatDescription(task),
         isCompleted: task.isCompleted,
         onTap: onTap,
         onComplete:

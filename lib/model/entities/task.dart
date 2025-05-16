@@ -25,6 +25,12 @@ class Task extends HiveObject {
   @HiveField(7)
   final DateTime createdDate;
 
+  @HiveField(8)
+  bool isRecurring;
+
+  @HiveField(9)
+  List<int>? recurringDays;
+
   Task({
     required this.id,
     required this.title,
@@ -33,12 +39,17 @@ class Task extends HiveObject {
     this.completedAt,
     required this.category,
     DateTime? createdDate,
-  }) : createdDate = createdDate ?? DateTime.now();
+    required this.isRecurring,
+    List<int>? recurringDays,
+  }) : createdDate = createdDate ?? DateTime.now(),
+       recurringDays = recurringDays ?? [];
 
   factory Task.create({
     required String title,
     required int energyReward,
     required TaskCategory category,
+    required bool isRecurring,
+    List<int>? recurringDays,
   }) {
     final now = DateTime.now();
     return Task(
@@ -47,6 +58,8 @@ class Task extends HiveObject {
       energyReward: energyReward,
       category: category,
       createdDate: now,
+      isRecurring: isRecurring,
+      recurringDays: recurringDays ?? [],
     );
   }
 

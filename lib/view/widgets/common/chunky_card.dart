@@ -172,7 +172,7 @@ class ChunkyTaskCard extends StatelessWidget {
           children: [
             Container(
               width: 8,
-              height: description != null ? 80 : 40,
+              height: description != null && !isCompleted ? 80 : 40,
               decoration: BoxDecoration(
                 color: indicatorColor,
                 borderRadius: BorderRadius.circular(4),
@@ -194,6 +194,13 @@ class ChunkyTaskCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  if (description != null && !isCompleted) ...[
+                    SizedBox(height: AppTheme.spacing.xsmall),
+                    Text(
+                      description!,
+                      style: AppTheme.typography.subtitle2,
+                    )
+                  ],
                 ],
               ),
             ),

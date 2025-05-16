@@ -69,10 +69,12 @@ class TaskController extends BaseController {
   Future<void> createTask(
     String title,
     int energyReward,
-    TaskCategory category, {
+    TaskCategory category,
+    bool isRecurring,
+    List<int>? recurringDays, {
     DateTime? date,
   }) async {
-    await _taskManager.createTask(title, energyReward, category, date: date);
+    await _taskManager.createTask(title, energyReward, category, isRecurring, recurringDays, date: date);
   }
 
   /// Update an existing task
