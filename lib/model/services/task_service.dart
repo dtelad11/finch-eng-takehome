@@ -75,6 +75,18 @@ class TaskService {
     return getTasksForDay(currentDate);
   }
 
+  static List<Task> getRecurringTasksForWeekday(int weekday) {
+    // Return all the recurring tasks for a given weekday.
+    final box = _getBox();
+
+    return box.values
+      .where((task) =>
+          task.isRecurring &&
+          task.recurringDays != null &&
+          task.recurringDays!.contains(weekday))
+      .toList();
+  }
+
   static Future<Task> createTask({
     required String title,
     required int energyReward,

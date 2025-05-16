@@ -4,6 +4,7 @@ import 'package:birdo/model/entities/day.dart';
 import 'package:birdo/model/entities/task.dart';
 import 'package:birdo/model/managers/base_manager.dart';
 import 'package:birdo/model/services/day_service.dart';
+import 'package:birdo/model/services/task_service.dart';
 import 'package:flutter/foundation.dart';
 
 class DayManager extends BaseManager {
@@ -44,6 +45,8 @@ class DayManager extends BaseManager {
           'DayManager: Loaded day record for ${_currentDay!.getDateString()}',
         );
       }
+
+      await _addRecurringTasks();
 
       notifyListeners();
     } catch (e) {
@@ -140,6 +143,43 @@ class DayManager extends BaseManager {
       notifyListeners();
     } catch (e) {
       debugPrint('DayManager: Error adding task to day: $e');
+    }
+  }
+
+  Future<void> _addRecurringTasks() async {
+    // Add a copy of each recurring task to today.
+    /* Elli: Right now we're using task titles as their IDs. This is problematic
+       for two reasons.
+       One, if we later allow renaming tasks, or if the user adds two tasks with
+       the same name at least one of which is recurring, we will lose track of
+       the original recurring task.
+       Two, we're going to get more and more copies of the same recurring task
+       and iterate over it unnecessarily.
+       In the interest of time and for the purpose of this exercise, I kept
+       this inefficient solution. */
+    if (_currentDay == null) return;
+
+    final weekday = _currentDay!.date.weekday;
+    final recurringTasks = TaskService.getRecurringTasksForWeekday(weekday);
+
+    for (final originalTask in recurringTasks) {
+      final taskExists = _currentDay!.dailyTasks.any(
+        (task) => task.title == originalTask.title,
+      );
+
+      if (!taskExists) {
+        final newTask = Task.create(
+          title: originalTask.title,
+          energyReward: originalTask.energyReward,
+          category: originalTask.category,
+          isRecurring: originalTask.isRecurring,
+          recurringDays: originalTask.recurringDays,
+        );
+
+        await addTaskToDay(newTask);
+        await TaskService.saveTask(newTask);
+        debugPrint('DayManager: Created recurring task: ${newTask.title}');
+      }
     }
   }
 
