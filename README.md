@@ -19,7 +19,7 @@
 I implemented recurring tasks by extending the `Task` Hive object with two new fields:
 
 - `isRecurring`: a boolean indicating whether the task should repeat.
-- `recurringDays`: a list of weekday integers (e.g. `[1, 3, 5]` for Monday, Wednesday, Friday).
+- `recurringDays`: a list of weekday integers (for example, `[1, 3, 5]` for Monday, Wednesday, Friday).
 
 At the start of each day, the app iterates through all saved tasks. For every task marked as recurring, if the current weekday is listed in `recurringDays`, the app creates a new copy of that task and adds it to the current day's task list.
 
@@ -43,23 +43,27 @@ Given more time, I would extract a dedicated `RecurringTask` object to act as a 
 
 Additionally, the current implementation formats the repeat days using the `description` field within `TaskCard`. While convenient, this assumes that no custom description is present. A cleaner approach would be to pass the `recurringDays` directly to `ChunkyTaskCard` and have that widget render the repeat information independently.
 
+On the UI side, I would add an "Edit Task" dialog that allows users to modify existing tasks, including toggling recurrence on or off and adjusting the selected weekdays. This would give users more control over their habits and help prevent confusion if their routines change over time (or if they misclicked when creating the task).
+
+> After finishing this README I noticed that the codebase includes unit testing, which I missed due to my limited familiarity with Flutter's testing framework. I’d be happy to add test coverage with more time.
+
 ### Habit Encouragement
 
 I introduced several design choices to encourage users to opt into recurring tasks and to stick with them.
 
-**Default opt-in:**  
+**Default opt-in**
 The "Repeat Task?" checkbox is selected by default. Research shows that users tend to follow default settings (see [Johnson & Goldstein, 2003](https://www.science.org/doi/10.1126/science.1091721) and [Bellman et al., 2009](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1324803)). This simple change helps nudge users toward building habits without requiring extra effort.
 
-**Soft encouragement when opting out:**  
+**Soft encouragement when opting out**
 If the user turns off the checkbox, the app displays a short motivational message explaining that repeating tasks is a great way to form long-term habits.
 
-**Visual prominence for recurring tasks:**  
+**Visual prominence for recurring tasks**
 Recurring tasks are given more visual weight in the task list: they're slightly taller and include a label that shows the selected repeat days, reinforcing their importance and helping them stand out.
 
-**Positive reinforcement:**  
+**Positive reinforcement**
 Each time a recurring task is completed, a toast appears congratulating the user and showing how many times they’ve completed it so far.
 
-**Habit milestone reward:**  
+**Habit milestone reward**
 When a task is completed 7 times, the user unlocks a new friend! A cute sheep joins their self-care journey.
 
 ![A screenshot of the New Friend Unlocked dialog, congratulating the user for repeating a task 7 times and showing them their new sheep friend.](screenshots/sheep_friend.jpg)
