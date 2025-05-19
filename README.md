@@ -52,18 +52,23 @@ On the UI side, I would add an "Edit Task" dialog that allows users to modify ex
 I introduced several design choices to encourage users to opt into recurring tasks and to stick with them.
 
 **Default opt-in**
+
 The "Repeat Task?" checkbox is selected by default. Research shows that users tend to follow default settings (see [Johnson & Goldstein, 2003](https://www.science.org/doi/10.1126/science.1091721) and [Bellman et al., 2009](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1324803)). This simple change helps nudge users toward building habits without requiring extra effort.
 
 **Soft encouragement when opting out**
+
 If the user turns off the checkbox, the app displays a short motivational message explaining that repeating tasks is a great way to form long-term habits.
 
 **Visual prominence for recurring tasks**
+
 Recurring tasks are given more visual weight in the task list: they're slightly taller and include a label that shows the selected repeat days, reinforcing their importance and helping them stand out.
 
 **Positive reinforcement**
+
 Each time a recurring task is completed, a toast appears congratulating the user and showing how many times they’ve completed it so far.
 
 **Habit milestone reward**
+
 When a task is completed 7 times, the user unlocks a new friend! A cute sheep joins their self-care journey.
 
 ![A screenshot of the New Friend Unlocked dialog, congratulating the user for repeating a task 7 times and showing them their new sheep friend.](screenshots/sheep_friend.jpg)
