@@ -1,13 +1,23 @@
 import 'package:birdo/controllers/task_controller.dart';
 import 'package:birdo/model/managers/task_manager.dart';
+import 'package:birdo/view/widgets/common/birdo_toast.dart';
 import 'package:birdo/view/widgets/task_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 
 class TaskList extends StatelessWidget {
   final VoidCallback? onTaskTap;
 
   const TaskList({super.key, this.onTaskTap});
+
+  static const List<String> _congratsMessages = [
+    'Congrats!',
+    'Well done!',
+    'Keep it up!',
+    'Woot!',
+    'Huzzah!',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -46,11 +56,19 @@ class TaskList extends StatelessWidget {
               TaskCard(
                 task: task,
                 onTap: onTaskTap,
-                onCheckboxChanged: (isCompleted) {
+                onCheckboxChanged: (isCompleted) async {
                   if (isCompleted == true) {
-                    taskController.completeTask(task.id);
+                    await taskController.completeTask(task.id);
+
+                    final numCompleted = await taskManager.getNumCompleted(task);
+                    if (numCompleted != null && numCompleted > 1) {
+                      BirdoToastManager.showSuccess(
+                        context, // Elli: Not sure how to deal with this warning. Can't use a `mounted` check cause this is a stateless widget.
+                        message: "🎉 ${_congratsMessages[DateTime.now().millisecondsSinceEpoch % 5]} You completed ${task.title} $numCompleted times!",
+                      );
+                    }
                   } else {
-                    taskController.resetTask(task.id);
+                    await taskController.resetTask(task.id);
                   }
                 },
               ),

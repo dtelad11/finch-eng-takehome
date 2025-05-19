@@ -155,7 +155,7 @@ class DayManager extends BaseManager {
 
     for (final originalTask in recurringTasks) {
       final taskExists = _currentDay!.dailyTasks.any(
-        (task) => task.parentId == originalTask.id,
+        (task) => task.id == originalTask.id || task.parentId == originalTask.id,
       );
 
       if (!taskExists) {

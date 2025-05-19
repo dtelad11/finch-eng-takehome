@@ -177,6 +177,15 @@ class TaskManager extends BaseManager {
     return TaskService.getTask(taskId);
   }
 
+  Future<int?> getNumCompleted(Task task) async {
+    if (task.parentId != null) {
+      final parent = await TaskService.getTask(task.parentId!);
+      return parent?.numCompleted;
+    } else {
+      return task.numCompleted;
+    }
+  }
+
   Future<void> deleteTask(String taskId, {DateTime? date}) async {
     debugPrint('TaskManager: Deleting task: $taskId');
     try {
