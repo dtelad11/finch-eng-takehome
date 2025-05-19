@@ -18,24 +18,28 @@ class TaskAdapter extends TypeAdapter<Task> {
     };
     return Task(
       id: fields[0] as String,
-      title: fields[1] as String,
+      parentId: fields[1] as String?,
+      title: fields[2] as String,
       energyReward: (fields[3] as num).toInt(),
       isCompleted: fields[4] == null ? false : fields[4] as bool,
       completedAt: fields[5] as DateTime?,
       category: fields[6] as TaskCategory,
       createdDate: fields[7] as DateTime?,
-      isRecurring: fields[8] as bool,
-      recurringDays: (fields[9] as List?)?.cast<int>(),
+      numCompleted: fields[8] == null ? 0 : (fields[8] as num).toInt(),
+      isRecurring: fields[9] as bool,
+      recurringDays: (fields[10] as List?)?.cast<int>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, Task obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
+      ..write(obj.parentId)
+      ..writeByte(2)
       ..write(obj.title)
       ..writeByte(3)
       ..write(obj.energyReward)
@@ -48,8 +52,10 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(7)
       ..write(obj.createdDate)
       ..writeByte(8)
-      ..write(obj.isRecurring)
+      ..write(obj.numCompleted)
       ..writeByte(9)
+      ..write(obj.isRecurring)
+      ..writeByte(10)
       ..write(obj.recurringDays);
   }
 

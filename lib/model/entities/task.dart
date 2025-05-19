@@ -8,6 +8,9 @@ class Task extends HiveObject {
   final String id;
 
   @HiveField(1)
+  final String? parentId; // Parent task of a recurring task.
+
+  @HiveField(2)
   String title;
 
   @HiveField(3)
@@ -26,19 +29,24 @@ class Task extends HiveObject {
   final DateTime createdDate;
 
   @HiveField(8)
-  bool isRecurring;
+  int numCompleted;
 
   @HiveField(9)
+  bool isRecurring;
+
+  @HiveField(10)
   List<int>? recurringDays;
 
   Task({
     required this.id,
+    this.parentId,
     required this.title,
     required this.energyReward,
     this.isCompleted = false,
     this.completedAt,
     required this.category,
     DateTime? createdDate,
+    this.numCompleted = 0,
     required this.isRecurring,
     List<int>? recurringDays,
   }) : createdDate = createdDate ?? DateTime.now(),
@@ -49,15 +57,18 @@ class Task extends HiveObject {
     required int energyReward,
     required TaskCategory category,
     required bool isRecurring,
+    String? parentId,
     List<int>? recurringDays,
   }) {
     final now = DateTime.now();
     return Task(
       id: now.millisecondsSinceEpoch.toString(),
+      parentId: parentId,
       title: title,
       energyReward: energyReward,
       category: category,
       createdDate: now,
+      numCompleted: 0,
       isRecurring: isRecurring,
       recurringDays: recurringDays ?? [],
     );

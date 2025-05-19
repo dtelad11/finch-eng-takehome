@@ -82,6 +82,7 @@ class TaskService {
     return box.values
       .where((task) =>
           task.isRecurring &&
+          task.parentId == null &&
           task.recurringDays != null &&
           task.recurringDays!.contains(weekday))
       .toList();
@@ -126,6 +127,22 @@ class TaskService {
     debugPrint(
       'TaskService: Completing task: ${task.id} for date: ${ServiceLocator.dateTimeService.generateDayId(targetDate)}',
     );
+
+    // Increment numCompleted, either for this task or its parent.
+    if (task.parentId != null) {
+      final parent = await getTask(task.parentId!);
+      if (parent != null) {
+        parent.numCompleted += 1;
+        await saveTask(parent);
+        debugPrint(
+          'TaskService: Parent task completed ${parent.numCompleted} times',
+        );
+      } else {
+        task.numCompleted += 1;
+      }
+    } else {
+      task.numCompleted += 1;
+    }
 
     task.complete();
     await saveTask(task);

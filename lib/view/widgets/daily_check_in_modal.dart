@@ -26,7 +26,7 @@ class _DailyCheckInModalState extends State<DailyCheckInModal> {
   PetGrowthStage? _newGrowthStage;
 
   static const List<String> _checkInMessages = [
-    'Le\'s go!',
+    'Let\'s go!',
     'Let\'s make today amazing!',
     'Ready for a great day?',
     'Time to shine!',
