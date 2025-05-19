@@ -1,151 +1,82 @@
-# Birdo Tasks
-A gamified task management app that helps you stay productive while taking care of your virtual pet. 
+# Finch Software Engineer Take-Home
+## Habit Formation App
 
-## Prerequisites
-Before you begin, ensure you have the following installed:
-- [Flutter SDK](https://flutter.dev/docs/get-started/install) (^3.7.0)
-- [Dart SDK](https://dart.dev/get-dart) (compatible with Flutter SDK)
-- [Python](https://www.python.org/downloads/) (^3.9.0)
+**Submitted by:** Elli Amir
+[el.ad.david.amir@gmail.com](mailto:el.ad.david.amir@gmail.com)
+[LinkedIn Profile](https://www.linkedin.com/in/elli-el-ad-david-amir-68624b6/)
 
-Note that you can run flutter on web or iOS simulators. If you'd like to use iOS simulators, please make sure to download Xcode, and iOS SDK and setup simulators prior to the interview. See [additional components](https://developer.apple.com/documentation/xcode/downloading-and-installing-additional-xcode-components) and [simulators](https://developer.apple.com/documentation/xcode/running-your-app-in-simulator-or-on-a-device) for more information.
+**Total Time Spent:** Approximately 6 hours, not including software installations.
 
-## Getting Started
+### Project Description
 
-1. Install dependencies:
-```bash
-flutter pub get
-```
+1. **Recurring Tasks:** Add support for tasks that repeat daily or on specific weekdays.
+2. **Habit Encouragement:** Encourage users to create recurring tasks to help support long-term habit formation.
 
-2. Run the code generation for Hive:
-```bash
-flutter pub run build_runner build
-```
+> Note: For the purpose of this exercise, I focused on the Flutter codebase and did not make changes to the backend. If you'd like me to implement backend updates as well, I'd be happy to do so.
 
-3. Run the app:
-```bash
-flutter run
-```
+### Recurring Tasks
 
-### Running the server
-Install server dependencies by running 
-```bash 
-pip install -r server/requirements.txt
-```
-(Note: if you don't have pip downloaded yet run `python -m ensurepip --upgrade`)
+I implemented recurring tasks by extending the `Task` Hive object with two new fields:
 
-We use a local sqlite database for our server data storage. You'll need to create it before you can use the server. Run the following command
-to get started, and re-run it whenever you change server side schema:
-```python
-from server.database import init; init.reset_database()
-```
+- `isRecurring`: a boolean indicating whether the task should repeat.
+- `recurringDays`: a list of weekday integers (e.g. `[1, 3, 5]` for Monday, Wednesday, Friday).
 
-Finally run flask via this command:
-Then run the server via 
-```bash 
-export FLASK_APP=server/app.py; flask run -p 5001
-```
+At the start of each day, the app iterates through all saved tasks. For every task marked as recurring, if the current weekday is listed in `recurringDays`, the app creates a new copy of that task and adds it to the current day's task list.
 
-Note: Flask defaults to port 5000. We use port 5001 since macOS will often use port 5000 for AirPlay.
+Each copied task includes a `parentId` field referencing the original recurring task that generated it. This prevents duplicate copies and associates all instances with their original task.
 
-### CORS Workaround
-You can ignore this if running the client via an iOS simulator.
+In addition, I introduced a `numCompleted` field on the original (parent) task. Whenever a recurring copy is completed, the app increments the `numCompleted` value on its parent. This enables the app to track the user’s long-term consistency across all instances of a recurring task.
 
-If using a webrowser to debug, the browser will block requests to the localhost flask server. You can bypass this behavior by using the following
-command to run flutter:
-```bash
-flutter run -d chrome --web-browser-flag=--disable-web-security
-```
+#### UI
 
+In the "Add Task" dialog, I added a "Repeat Task?" checkbox. When selected, a row of weekday buttons appears (Monday through Sunday), allowing the user to specify repeat days (similar to calendar apps). Once configured, the user can create the task as usual.
 
-### Server <--> Client communication
-By default the client will ignore all requests made to the server.
-To configure the client to run against your local flask server set `enableServer = true` in `lib/core/services/server_service.dart`.
+![Screenshot of the Add Task dialog with "Repeat Task?" checkbox and weekday selector](screenshots/new_add_task_dialog.jpg)
 
-## Development
+On the app home page, where the task list is presented, recurring tasks display a calendar icon and a formatted label indicating which days the task repeats.
 
-The app uses several key packages:
-- `device_preview`: For testing the app on different device sizes
-- `hive_ce`: For local data persistence
-- `provider`: For state management
-- `flutter_lints`: For maintaining code quality
-- `equatable`: For value equality comparisons
+![Screenshot of the Home screen with one recurring task and one regular task.](screenshots/tasks_list.jpg)
 
-### Browser Preview
-To preview the app in a browser, you can enable the DevicePreview flag in `lib/main.dart`. Change the `enabled` parameter to `true` in the following code:
+#### Suggested Improvements
 
-```dart
-runApp(
-  DevicePreview(enabled: true, builder: (context) => const BirdoTasks()),
-);
-```
+Given more time, I would extract a dedicated `RecurringTask` object to act as a template for generating recurring task instances. This would create a cleaner separation between recurring task definitions and their day-specific copies, simplifying both logic and data modeling. It would also provide a natural foundation for supporting additional recurrence patterns, such as monthly or custom schedules.
 
-You can find this code at [lib/main.dart#L46-L48](https://github.com/Finch-Care/finch-eng-onsite/blob/main/lib/main.dart#L87-L89).
+Additionally, the current implementation formats the repeat days using the `description` field within `TaskCard`. While convenient, this assumes that no custom description is present. A cleaner approach would be to pass the `recurringDays` directly to `ChunkyTaskCard` and have that widget render the repeat information independently.
 
-Running `flutter run -d chrome` will open the app preview in the browser.
+### Habit Encouragement
 
-## Project Structure
+I introduced several design choices to encourage users to opt into recurring tasks and to stick with them.
 
-- `lib/`: Contains the main application code
-  - `core/`: Core functionality and services
-    - `constants/`: App-wide constants
-    - `services/`: Service layer implementations
-    - `theme/`: UI theming and styling
-  - `model/`: Data and business logic layer
-    - `entities/`: Data models and domain objects
-    - `services/`: Data access and persistence services
-    - `managers/`: State management and business logic
-  - `controllers/`: Application workflow coordination
-  - `view/`: UI layer
-    - `screens/`: UI screens
-    - `widgets/`: Reusable widgets
-  - `assets/`: Static assets and resources
-- `test/`: Contains test files
-- `ios/`: iOS-specific code
-- `android/`: Android-specific code
-- `web/`: Web-specific code
-- `server/`: Codebase for python flask server. 
+**Default opt-in:**  
+The "Repeat Task?" checkbox is selected by default. Research shows that users tend to follow default settings (see [Johnson & Goldstein, 2003](https://www.science.org/doi/10.1126/science.1091721) and [Bellman et al., 2009](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1324803)). This simple change helps nudge users toward building habits without requiring extra effort.
 
-## Architecture
-### Services
-- Pure Data Access Layer
-- Stateless utility classes with static methods
-- Handle direct database operations (CRUD with Hive)
-- No state management or notifications
-- Example: `PetService.createNewPet()` directly creates a pet in the database
-### Managers
-- State Management + Domain Logic Layer
-- Maintain in-memory state (e.g., current tasks, current day)
-- Extend ChangeNotifier to provide reactive updates
-- Implement domain-specific business logic
-- Delegate data persistence to Services
-- Example: `TaskManager` maintains a list of tasks and notifies listeners when it changes
-### Controllers
-- Coordination + Workflow Layer
-- Orchestrate operations across multiple managers
-- Handle complex workflows and user interactions
-- Implement cross-domain business logic
-- Example: `HomeController.completeTask()` coordinates updates across task, pet, and day managers
-### Entities
-- Data Structure Layer
-- Define the structure of domain objects
-- May contain entity-specific validation and simple operations
-- Example: `Task` defines the structure of a task and basic operations like `completeTask()`
+**Soft encouragement when opting out:**  
+If the user turns off the checkbox, the app displays a short motivational message explaining that repeating tasks is a great way to form long-term habits.
 
-## Business Logic Distribution Guidelines
-The distribution of business logic follows these principles:
+**Visual prominence for recurring tasks:**  
+Recurring tasks are given more visual weight in the task list: they're slightly taller and include a label that shows the selected repeat days, reinforcing their importance and helping them stand out.
 
-**Entity-specific logic** â†’ Place in the entity itself
+**Positive reinforcement:**  
+Each time a recurring task is completed, a toast appears congratulating the user and showing how many times they’ve completed it so far.
 
-Example: `pet.isReadyToEvolve()` belongs in the Pet class
+**Habit milestone reward:**  
+When a task is completed 7 times, the user unlocks a new friend! A cute sheep joins their self-care journey.
 
-**Domain-specific state management** â†’ Place in managers
+![A screenshot of the New Friend Unlocked dialog, congratulating the user for repeating a task 7 times and showing them their new sheep friend.](screenshots/sheep_friend.jpg)
 
-Example: `TaskManager.loadTasksForDay()` manages task state for a specific day
+#### Suggested Improvements
 
-**Cross-domain workflows** â†’ Place in controllers
+There’s a wide range of ways this feature could evolve. My goal for this project was to build a proof of concept, demonstrating several directions the app could take. Here are a few ideas for future expansion:
 
-Example: When completing a task affects the pet's energy and day's record, this coordination logic belongs in the controller
+- A dedicated screen or dialog showing how many times a recurring task has been completed, with breakdowns by day of the week or calendar view.
+- Unlock in-game currency, customization items, or pet growth stages after completing a recurring task a certain number of times.
+- Introduce more collectible friends, with an interface to view, track, and choose which one appears on the home screen.
+- Visual indicators for daily or weekly streaks tied to recurring tasks.
+- Suggest making a task recurring based on completion patterns ("you've done this 3 Mondays in a row, want to make this a recurring weekly task?").
 
-**Data persistence operations** â†’ Place in services
+---
 
-Example: `DayService.getOrCreate()` handles the database interaction
+Thank you for reviewing my take-home. I had a blast working on this project! Please let me know if you'd like me to expand it further or walk through any part of the implementation.
+
+*-- Elli (they/them)*
+
